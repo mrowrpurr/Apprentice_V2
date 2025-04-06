@@ -13,7 +13,6 @@
 // TESDeathEvent
 // TESDestructionStageChangedEvent
 // TESEnterBleedoutEvent
-// TESEquipEvent
 // TESFormDeleteEvent
 // TESFurnitureEvent
 // TESGrabReleaseEvent
@@ -57,7 +56,8 @@
 
 class EventSink : public RE::BSTEventSink<SKSE::CrosshairRefEvent>,
                   public RE::BSTEventSink<RE::TESActivateEvent>,
-                  public RE::BSTEventSink<RE::InputEvent*> {
+                  public RE::BSTEventSink<RE::InputEvent*>,
+                  public RE::BSTEventSink<RE::TESEquipEvent> {
 public:
     static EventSink& instance() {
         static EventSink singleton;
@@ -128,6 +128,23 @@ public:
             Log("Player is in the process of firing!");
         else if (attackState == RE::ATTACK_STATE_ENUM::kFired) Log("Player has fired a weapon!");
 
+        auto weaponState = player->AsActorState()->GetWeaponState();
+        if (weaponState == RE::WEAPON_STATE::kSheathed) Log("Weapon is sheathed!");
+        else if (weaponState == RE::WEAPON_STATE::kWantToDraw)
+            Log("Player wants to draw a weapon!");
+        else if (weaponState == RE::WEAPON_STATE::kDrawing) Log("Player is drawing a weapon!");
+        else if (weaponState == RE::WEAPON_STATE::kDrawn) Log("Weapon is drawn!");
+        else if (weaponState == RE::WEAPON_STATE::kWantToSheathe)
+            Log("Player wants to sheathe a weapon!");
+        else if (weaponState == RE::WEAPON_STATE::kSheathing) Log("Player is sheathing a weapon!");
+
+        // player->AsActorState()->IsWeaponDrawn()
+        // player->AsActorState()->IsSprinting()
+        // player->AsActorState()->IsWalking()
+        // player->AsActorState()->GetFlyState()
+        // player->AsActorState()->IsSneaking()
+        // player->AsActorState()->IsFlying()
+
         // if (event->GetEventType() == RE::INPUT_EVENT_TYPE::kButton) {
         //     auto* buttonEvent = event->AsButtonEvent();
         //     auto  dxScanCode  = buttonEvent->GetIDCode();
@@ -135,17 +152,100 @@ public:
 
         return RE::BSEventNotifyControl::kContinue;
     }
+
+    RE::BSEventNotifyControl
+    ProcessEvent(const RE::TESEquipEvent* event, RE::BSTEventSource<RE::TESEquipEvent>*) {
+        if (event && event->actor && event->actor->IsPlayerRef()) {
+            if (event->equipped) {
+                Log("Player equipped {:x}", event->baseObject);
+            } else {
+                Log("Player unequipped {:x}", event->baseObject);
+            }
+        }
+        return RE::BSEventNotifyControl::kContinue;
+    }
 };
 
-SKSEPlugin_OnDataLoaded {
-    RE::BSInputDeviceManager::GetSingleton()->AddEventSink((&EventSink::instance()));
+//
 
-    SKSE::GetCrosshairRefEventSource()->AddEventSink(&EventSink::instance());
+auto updatesInLastSecond = 0;
+auto lastLogOutputTime   = std::chrono::high_resolution_clock::now();
 
-    auto* eventSourceHolder = RE::ScriptEventSourceHolder::GetSingleton();
-    if (eventSourceHolder) {
-        eventSourceHolder->AddEventSink<RE::TESActivateEvent>(&EventSink::instance());
-    } else {
-        Log("Failed to get ScriptEventSourceHolder!");
+namespace Mrowr::Hooks {
+    void Install(SKSE::Trampoline& trampoline);
+
+    using MainUpdateFn = void (*)(RE::Main*, float);
+    inline REL::Relocation<MainUpdateFn> _OriginalMainUpdate;
+}
+
+namespace Mrowr::Hooks {
+    void MainUpdateHook(RE::Main* a_this, float deltaTime) {
+        if (std::chrono::high_resolution_clock::now() - lastLogOutputTime >
+            std::chrono::seconds(1)) {
+            Log("MainUpdate called {} times in the last second", updatesInLastSecond);
+            updatesInLastSecond = 0;
+            lastLogOutputTime   = std::chrono::high_resolution_clock::now();
+        } else {
+            ++updatesInLastSecond;
+        }
+
+        // Your per-frame logic here
+        // auto* player = RE::PlayerCharacter::GetSingleton();
+        // if (player && player->Is3DLoaded()) {
+        //     // Check ActorState or anything else you need
+        // }
+
+        // Call original
+        _OriginalMainUpdate(a_this, deltaTime);
+    }
+
+    void Install(SKSE::Trampoline& trampoline) {
+        // AE = 36564, SE = 35565
+        REL::Relocation<std::uintptr_t> target{REL::ID(36564), 0xC26};
+        _OriginalMainUpdate = trampoline.write_call<5>(target.address(), MainUpdateHook);
     }
 }
+
+//
+
+SKSEPlugin_Entrypoint {
+    SKSE::AllocTrampoline(64);
+    auto& trampoline = SKSE::GetTrampoline();
+    //
+    Mrowr::Hooks::Install(trampoline);
+}
+
+SKSEPlugin_OnDataLoaded {
+    // RE::BSInputDeviceManager::GetSingleton()->AddEventSink((&EventSink::instance()));
+
+    // SKSE::GetCrosshairRefEventSource()->AddEventSink(&EventSink::instance());
+
+    // auto* eventSourceHolder = RE::ScriptEventSourceHolder::GetSingleton();
+    // if (eventSourceHolder) {
+    //     eventSourceHolder->AddEventSink<RE::TESActivateEvent>(&EventSink::instance());
+    // } else {
+    //     Log("Failed to get ScriptEventSourceHolder!");
+    // }
+}
+
+// enum class PLAYER_ACTION
+// {
+// 	kNone = 0,
+// 	kSwingMeleeWeapon,
+// 	kCastProjectileSpell,
+// 	kShootBow,
+// 	kZKeyObject,
+// 	kJumping,
+// 	kKnockingOverObjects,
+// 	kStandOnTableChair,
+// 	kIronSights,
+// 	kDestroyObject,
+// 	kLockedObject,
+// 	kPickpocket,
+// 	kCastSelfSpell,
+// 	kShout,
+// 	kActorCollision,
+
+// 	kTotal,
+// 	kInvalidMarker
+// };
