@@ -1,0 +1,127 @@
+{
+    __meta__ = {
+        version = "1.0"
+    },
+    ["windows|x64"] = {
+        ["SkyrimScripting.Entrypoint#d465e6c4"] = {
+            branch = "@default",
+            repo = {
+                commit = "1c5d83c3faad37800acdd0c98347a6695e4ab933",
+                url = "https://github.com/SkyrimScriptingBeta/Packages.git"
+            },
+            version = "@default"
+        },
+        ["SkyrimScripting.Logging#d465e6c4"] = {
+            branch = "@default",
+            repo = {
+                commit = "1c5d83c3faad37800acdd0c98347a6695e4ab933",
+                url = "https://github.com/SkyrimScriptingBeta/Packages.git"
+            },
+            version = "@default"
+        },
+        ["SkyrimScripting.Plugin#d465e6c4"] = {
+            branch = "@default",
+            repo = {
+                commit = "1c5d83c3faad37800acdd0c98347a6695e4ab933",
+                url = "https://github.com/SkyrimScriptingBeta/Packages.git"
+            },
+            version = "@default"
+        },
+        ["SkyrimScripting.SKSE_Messages#d465e6c4"] = {
+            branch = "@default",
+            repo = {
+                commit = "1c5d83c3faad37800acdd0c98347a6695e4ab933",
+                url = "https://github.com/SkyrimScriptingBeta/Packages.git"
+            },
+            version = "@default"
+        },
+        ["cmake#31fecfc4"] = {
+            repo = {
+                branch = "master",
+                commit = "b6ed71b4ce4bb87f0035e0bc4119a80ba6f738e2",
+                url = "https://github.com/xmake-io/xmake-repo.git"
+            },
+            version = "3.31.5"
+        },
+        ["collections#31fecfc4"] = {
+            branch = "@default",
+            repo = {
+                commit = "29972e772984f0c9b17f433c663ae654b4dc1e45",
+                url = "https://github.com/MrowrLib/Packages.git"
+            },
+            version = "@default"
+        },
+        ["dependency_injection#31fecfc4"] = {
+            branch = "@default",
+            repo = {
+                commit = "6887c023180286b54b805f50ec33eab3f30e4818",
+                url = "https://github.com/MrowrLib/Packages.git"
+            },
+            version = "@default"
+        },
+        ["fmt#c9428c73"] = {
+            repo = {
+                branch = "master",
+                commit = "bb54400b27d668592875c08369f7d1cb5b251648",
+                url = "https://github.com/xmake-io/xmake-repo.git"
+            },
+            version = "11.1.4"
+        },
+        ["global_macro_functions#31fecfc4"] = {
+            branch = "@default",
+            repo = {
+                commit = "29972e772984f0c9b17f433c663ae654b4dc1e45",
+                url = "https://github.com/MrowrLib/Packages.git"
+            },
+            version = "@default"
+        },
+        ["rapidcsv#31fecfc4"] = {
+            repo = {
+                branch = "master",
+                commit = "0521e894dd93b531476f9e1064587f75b589b21d",
+                url = "https://github.com/xmake-io/xmake-repo.git"
+            },
+            version = "v8.85"
+        },
+        ["skse_plugin_info#31fecfc4"] = {
+            branch = "@default",
+            repo = {
+                commit = "58de063a5893d3f11dfb53317fe988623617ca15",
+                url = "https://github.com/SkyrimScripting/Packages.git"
+            },
+            version = "@default"
+        },
+        ["skyrim-commonlib-ng#31fecfc4"] = {
+            branch = "@default",
+            repo = {
+                commit = "340aad6d596f5199cb1b4f5a79a594d4d9e4fc72",
+                url = "https://github.com/SkyrimScripting/Packages.git"
+            },
+            version = "@default"
+        },
+        ["spdlog#b06e1130"] = {
+            repo = {
+                branch = "master",
+                commit = "627427381860516c14b27ad87012f56d0d931620",
+                url = "https://github.com/xmake-io/xmake-repo.git"
+            },
+            version = "v1.15.2"
+        },
+        ["unordered_dense#31fecfc4"] = {
+            repo = {
+                branch = "master",
+                commit = "500c05225a1eeaf27f4b32e17ec181d6bcd305b4",
+                url = "https://github.com/xmake-io/xmake-repo.git"
+            },
+            version = "v4.5.0"
+        },
+        ["xbyak#31fecfc4"] = {
+            repo = {
+                branch = "master",
+                commit = "500c05225a1eeaf27f4b32e17ec181d6bcd305b4",
+                url = "https://github.com/xmake-io/xmake-repo.git"
+            },
+            version = "v7.06"
+        }
+    }
+}

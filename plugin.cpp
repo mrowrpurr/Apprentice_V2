@@ -168,8 +168,41 @@ public:
 
 //
 
-auto updatesInLastSecond = 0;
-auto lastLogOutputTime   = std::chrono::high_resolution_clock::now();
+#include <collections.h>
+
+collections_map<RE::WEAPON_STATE, std::string> WEAPON_STATE_NAMES = {
+    {RE::WEAPON_STATE::kSheathed,      "Sheathed"     },
+    {RE::WEAPON_STATE::kWantToDraw,    "WantToDraw"   },
+    {RE::WEAPON_STATE::kDrawing,       "Drawing"      },
+    {RE::WEAPON_STATE::kDrawn,         "Drawn"        },
+    {RE::WEAPON_STATE::kWantToSheathe, "WantToSheathe"},
+    {RE::WEAPON_STATE::kSheathing,     "Sheathing"    },
+};
+
+collections_map<RE::ATTACK_STATE_ENUM, std::string> ATTACK_STATE_NAMES = {
+    {RE::ATTACK_STATE_ENUM::kNone,             "None"            },
+    {RE::ATTACK_STATE_ENUM::kDraw,             "Draw"            },
+    {RE::ATTACK_STATE_ENUM::kSwing,            "Swing"           },
+    {RE::ATTACK_STATE_ENUM::kHit,              "Hit"             },
+    {RE::ATTACK_STATE_ENUM::kNextAttack,       "NextAttack"      },
+    {RE::ATTACK_STATE_ENUM::kFollowThrough,    "FollowThrough"   },
+    {RE::ATTACK_STATE_ENUM::kBash,             "Bash"            },
+    {RE::ATTACK_STATE_ENUM::kBowDraw,          "BowDraw"         },
+    {RE::ATTACK_STATE_ENUM::kBowAttached,      "BowAttached"     },
+    {RE::ATTACK_STATE_ENUM::kBowDrawn,         "BowDrawn"        },
+    {RE::ATTACK_STATE_ENUM::kBowReleasing,     "BowReleasing"    },
+    {RE::ATTACK_STATE_ENUM::kBowReleased,      "BowReleased"     },
+    {RE::ATTACK_STATE_ENUM::kBowNextAttack,    "BowNextAttack"   },
+    {RE::ATTACK_STATE_ENUM::kBowFollowThrough, "BowFollowThrough"},
+    {RE::ATTACK_STATE_ENUM::kFire,             "Fire"            },
+    {RE::ATTACK_STATE_ENUM::kFiring,           "Firing"          },
+    {RE::ATTACK_STATE_ENUM::kFired,            "Fired"           }
+};
+
+auto                  updatesInLastSecond = 0;
+auto                  lastLogOutputTime   = std::chrono::high_resolution_clock::now();
+RE::WEAPON_STATE      lastWeaponState     = RE::WEAPON_STATE::kSheathed;
+RE::ATTACK_STATE_ENUM lastAttackState     = RE::ATTACK_STATE_ENUM::kNone;
 
 namespace Mrowr::Hooks {
     void Install(SKSE::Trampoline& trampoline);
@@ -182,7 +215,7 @@ namespace Mrowr::Hooks {
     void MainUpdateHook(RE::Main* a_this, float deltaTime) {
         if (std::chrono::high_resolution_clock::now() - lastLogOutputTime >
             std::chrono::seconds(1)) {
-            Log("MainUpdate called {} times in the last second", updatesInLastSecond);
+            // Log("MainUpdate called {} times in the last second", updatesInLastSecond);
             updatesInLastSecond = 0;
             lastLogOutputTime   = std::chrono::high_resolution_clock::now();
         } else {
@@ -190,10 +223,17 @@ namespace Mrowr::Hooks {
         }
 
         // Your per-frame logic here
-        // auto* player = RE::PlayerCharacter::GetSingleton();
-        // if (player && player->Is3DLoaded()) {
-        //     // Check ActorState or anything else you need
-        // }
+        if (auto* player = RE::PlayerCharacter::GetSingleton()) {
+            if (player->AsActorState()->GetWeaponState() != lastWeaponState) {
+                lastWeaponState = player->AsActorState()->GetWeaponState();
+                Log("Weapon state changed to {}", WEAPON_STATE_NAMES[lastWeaponState]);
+            }
+
+            if (player->AsActorState()->GetAttackState() != lastAttackState) {
+                lastAttackState = player->AsActorState()->GetAttackState();
+                Log("Attack state changed to {}", ATTACK_STATE_NAMES[lastAttackState]);
+            }
+        }
 
         // Call original
         _OriginalMainUpdate(a_this, deltaTime);

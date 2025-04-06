@@ -1,5 +1,7 @@
 add_rules("mode.debug", "mode.release")
 
+set_policy("package.requires_lock", true)
+
 set_languages("c++23")
 
 option("commonlib")
@@ -18,6 +20,11 @@ includes("xmake/*.lua")
 
 add_requires(get_config("commonlib"))
 add_requires("SkyrimScripting.Plugin", { configs = { commonlib = get_config("commonlib") } })
+add_requires(
+    "collections",
+    "unordered_dense",
+    "dependency_injection"
+)
 
 -- target("Build Papyrus Scripts")
 --     set_kind("phony")
@@ -28,7 +35,14 @@ skse_plugin({
     version = "0.0.1",
     author = "Mrowr Purr",
     email = "mrowr.purr@gmail.com",
+    src = {"plugin.cpp", "src/**.cpp"},
+    packages = {
+        "SkyrimScripting.Plugin",
+        "collections",
+        "unordered_dense",
+        "dependency_injection",
+    },
+})
+
     -- mod_files = {"Scripts"},
     -- deps = {"Build Papyrus Scripts"},
-    packages = {"SkyrimScripting.Plugin"},
-})

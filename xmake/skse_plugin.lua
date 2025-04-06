@@ -10,9 +10,11 @@ function skse_plugin(plugin_info)
     
     target(plugin_info.name .. " (" .. commonlib_version:upper() .. ")")
         set_basename(plugin_info.name .. "-" .. commonlib_version:upper())
-        add_files(plugin_info.src or "src/*.cpp")
-        if plugin_info.include then
-            add_includedirs(plugin_info.include)
+        for _, src in ipairs(plugin_info.src or {}) do
+            add_files(src)
+        end
+        for _, include in ipairs(plugin_info.include or {}) do
+            add_includedirs(include)
         end
         add_packages("skyrim-commonlib-" .. commonlib_version)
         add_rules("@skyrim-commonlib-" .. commonlib_version .. "/plugin", {
